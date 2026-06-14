@@ -277,7 +277,7 @@ export default function Home() {
                       <th className="text-left px-4 py-3 font-semibold">物件名・間取り</th>
                       <th className="text-left px-4 py-3 font-semibold w-28">価格</th>
                       <th className="text-left px-4 py-3 font-semibold w-24">エリア</th>
-                      <th className="text-left px-4 py-3 font-semibold w-24">収集日</th>
+                      <th className="text-left px-4 py-3 font-semibold w-24">更新日</th>
                       <th className="px-4 py-3 w-16" />
                     </tr>
                   </thead>
