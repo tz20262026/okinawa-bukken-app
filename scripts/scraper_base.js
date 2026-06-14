@@ -73,7 +73,7 @@ async function scrapeUchina(context) {
           price = price.replace(/お気に入り.*/, '').trim();
         }
         if (!price) {
-          const pm = card.textContent.match(/([\d,]+(?:\.\d+)?万円)/);
+          const pm = card.textContent.match(/(\d+億(?:[\d,]+万)?円|[\d,]+(?:\.\d+)?万円)/);
           price = pm ? pm[1] : '価格不明';
         }
 
@@ -162,14 +162,14 @@ async function scrapeGoohome(context) {
 
         // 価格・エリア・間取りを含む行を探す
         // 例: "那覇市仲井真6.8万円２LDK"
-        const infoLine = lines.find(l => /万円/.test(l)) || '';
+        const infoLine = lines.find(l => /[億万]円/.test(l)) || '';
 
         let price = '';
         let area = '';
 
         if (infoLine) {
-          // 価格を抽出（例: "6.8万円" "4,050万円"）
-          const priceMatch = infoLine.match(/([\d,]+(?:\.\d+)?万円(?:\/月)?)/);
+          // 価格を抽出（例: "6.8万円" "4,050万円" "1億100万円"）
+          const priceMatch = infoLine.match(/(\d+億(?:[\d,]+万)?円|[\d,]+(?:\.\d+)?万円(?:\/月)?)/);
           price = priceMatch ? priceMatch[1] : '価格不明';
 
           // エリア = 価格より前の市区町村部分
@@ -252,8 +252,8 @@ async function scrapeSumaism(context) {
         const priceCell = cells[2] ? cells[2].textContent.trim() : '';
         const madoriCell = cells[3] ? cells[3].textContent.trim() : '';
 
-        // 価格チェック: 万円が含まれているかで物件行かどうか判定
-        if (!priceCell || !/万円/.test(priceCell)) continue;
+        // 価格チェック: 万円・億円が含まれているかで物件行かどうか判定
+        if (!priceCell || !/[億万]円/.test(priceCell)) continue;
 
         // 物件名: "浦添市伊祖アパート" → エリア名 + 建物種別
         let propName = nameCell.replace(/\s+/g, '');
@@ -272,8 +272,8 @@ async function scrapeSumaism(context) {
           if (areaMatch) area = areaMatch[0];
         }
 
-        // 価格: "6.8万円／600円" → "6.8万円"
-        const priceMatch = priceCell.match(/([\d.]+万円)/);
+        // 価格: "6.8万円／600円" → "6.8万円"、"1億100万円" → "1億100万円"
+        const priceMatch = priceCell.match(/(\d+億(?:[\d,]+万)?円|[\d.]+万円)/);
         const price = priceMatch ? priceMatch[1] : priceCell;
 
         // 詳細URL: js_FormOpen のリンクから構築

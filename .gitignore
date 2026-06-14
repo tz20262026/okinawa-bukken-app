@@ -49,3 +49,5 @@ next-env.d.ts
 
 # playwright browser binaries
 /node_modules/.playwright/
+
+.vercel

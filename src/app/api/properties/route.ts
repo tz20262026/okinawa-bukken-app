@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || undefined;
     const sort = (searchParams.get('sort') || 'newest') as SortKey;
     const propType = searchParams.get('propType') || undefined;
+    const verdict = searchParams.get('verdict') || undefined;
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '50', 10);
     const statsOnly = searchParams.get('stats') === '1';
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(stats);
     }
 
-    const result = getProperties({ source, area, date, search, propType, sort, page, limit });
+    const result = getProperties({ source, area, date, search, propType, verdict, sort, page, limit });
     return NextResponse.json(result);
   } catch (e) {
     console.error('DB error:', e);

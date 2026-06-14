@@ -76,7 +76,7 @@ async function scrapeUchina(context) {
         const propType = typeEl ? typeEl.textContent.trim() : '';
         const priceEl = card.querySelector('.bukken-data-price');
         let price = priceEl ? priceEl.textContent.replace(/\s+/g, '').replace(/お気に入り.*/, '').trim() : '';
-        if (!price) { const pm = card.textContent.match(/([\d,]+(?:\.\d+)?万円)/); price = pm ? pm[1] : '価格不明'; }
+        if (!price) { const pm = card.textContent.match(/(\d+億(?:[\d,]+万)?円|[\d,]+(?:\.\d+)?万円)/); price = pm ? pm[1] : '価格不明'; }
         const madoriEl = card.querySelector('.bukken-data-madori');
         let madori = '';
         if (madoriEl) { const m = madoriEl.textContent.match(/\d[SLDK]+/); madori = m ? m[0] : ''; }
@@ -117,8 +117,8 @@ async function scrapeGoohome(context) {
         const url = href.startsWith('http') ? href : 'https://goohome.jp' + href;
         if (seen.has(url)) continue; seen.add(url);
         const lines = el.textContent.trim().split('\n').map(l => l.trim()).filter(l => l.length > 0);
-        const infoLine = lines.find(l => /万円/.test(l)) || '';
-        const priceMatch = infoLine.match(/([\d,]+(?:\.\d+)?万円(?:\/月)?)/);
+        const infoLine = lines.find(l => /[億万]円/.test(l)) || '';
+        const priceMatch = infoLine.match(/(\d+億(?:[\d,]+万)?円|[\d,]+(?:\.\d+)?万円(?:\/月)?)/);
         const price = priceMatch ? priceMatch[1] : '価格不明';
         let area = '';
         if (priceMatch) {
@@ -153,11 +153,11 @@ async function scrapeSumaism(context) {
         const cells = Array.from(row.querySelectorAll('td'));
         if (cells.length < 7) continue;
         const priceCell = cells[2] ? cells[2].textContent.trim() : '';
-        if (!priceCell || !/万円/.test(priceCell)) continue;
+        if (!priceCell || !/[億万]円/.test(priceCell)) continue;
         const nameCell = cells[1] ? cells[1].textContent.trim().replace(/\s+/g, '') : '';
         let area = '', propName = nameCell;
         for (const a of areas) { if (propName.includes(a)) { area = a; propName = propName.replace(a, '').trim(); break; } }
-        const priceMatch = priceCell.match(/([\d.]+万円)/);
+        const priceMatch = priceCell.match(/(\d+億(?:[\d,]+万)?円|[\d.]+万円)/);
         const price = priceMatch ? priceMatch[1] : priceCell;
         const madori = cells[3] ? cells[3].textContent.trim() : '';
         const linkEl = row.querySelector('a[href^="javascript:js_FormOpen"]');

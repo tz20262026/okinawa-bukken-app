@@ -14,6 +14,12 @@ export type Property = {
   url: string;
   date_str: string;
   scraped_at: string;
+  verdict: string | null;
+  verdict_benchmark: number | null;
+  verdict_diff: number | null;
+  lat?: number | null;
+  lng?: number | null;
+  address_detail?: string;
 };
 
 export type SortKey = 'newest' | 'price_asc' | 'price_desc' | 'area';
@@ -24,6 +30,7 @@ export type PropertiesFilter = {
   date?: string;
   search?: string;
   propType?: string;
+  verdict?: string;
   sort?: SortKey;
   page?: number;
   limit?: number;
@@ -55,13 +62,13 @@ function getAllFromJson(): Property[] {
 }
 
 function filterAndSort(all: Property[], filter: PropertiesFilter): { data: Property[]; total: number } {
-  const { source, area, date, search, propType, sort = 'newest', page = 1, limit = 50 } = filter;
-
+  const { source, area, date, search, propType, verdict, sort = 'newest', page = 1, limit = 50 } = filter;
   let rows = all;
   if (source) rows = rows.filter(r => r.source === source);
   if (area) rows = rows.filter(r => r.area?.includes(area));
   if (date) rows = rows.filter(r => r.date_str === date);
   if (propType) rows = rows.filter(r => r.prop_name?.includes(propType));
+  if (verdict) rows = rows.filter(r => r.verdict === verdict);
   if (search) {
     const q = search.toLowerCase();
     rows = rows.filter(r =>
@@ -84,20 +91,30 @@ function filterAndSort(all: Property[], filter: PropertiesFilter): { data: Prope
   return { data, total };
 }
 
-function getStatsFromJson(): { sources: Record<string, number>; dates: string[]; total: number; areaCounts: Record<string, number> } {
+type AreaVerdictCounts = Record<string, { yasui: number; soba: number; takai: number; total: number }>;
+
+function getStatsFromJson(): { sources: Record<string, number>; dates: string[]; total: number; areaCounts: Record<string, number>; areaVerdictCounts: AreaVerdictCounts } {
   const all = getAllFromJson();
   const sources: Record<string, number> = {};
   const dateSet = new Set<string>();
   const areaCounts: Record<string, number> = {};
+  const areaVerdictCounts: AreaVerdictCounts = {};
 
   for (const r of all) {
     sources[r.source] = (sources[r.source] || 0) + 1;
     if (r.date_str) dateSet.add(r.date_str);
-    if (r.area) areaCounts[r.area] = (areaCounts[r.area] || 0) + 1;
+    if (r.area) {
+      areaCounts[r.area] = (areaCounts[r.area] || 0) + 1;
+      if (!areaVerdictCounts[r.area]) areaVerdictCounts[r.area] = { yasui: 0, soba: 0, takai: 0, total: 0 };
+      areaVerdictCounts[r.area].total++;
+      if (r.verdict === '割安') areaVerdictCounts[r.area].yasui++;
+      else if (r.verdict === '割高') areaVerdictCounts[r.area].takai++;
+      else if (r.verdict === '相場並み') areaVerdictCounts[r.area].soba++;
+    }
   }
 
   const dates = Array.from(dateSet).sort((a, b) => b.localeCompare(a));
-  return { sources, dates, total: all.length, areaCounts };
+  return { sources, dates, total: all.length, areaCounts, areaVerdictCounts };
 }
 
 // ────────────────────────────────────────────────
@@ -140,13 +157,19 @@ function getPropertiesSqlite(filter: PropertiesFilter): { data: Property[]; tota
       source TEXT NOT NULL,
       prop_name TEXT, price TEXT, area TEXT,
       url TEXT UNIQUE, date_str TEXT,
-      scraped_at TEXT DEFAULT (datetime('now', '+9 hours'))
+      scraped_at TEXT DEFAULT (datetime('now', '+9 hours')),
+      verdict TEXT, verdict_benchmark REAL, verdict_diff REAL
     );
     CREATE INDEX IF NOT EXISTS idx_date ON properties(date_str);
     CREATE INDEX IF NOT EXISTS idx_source ON properties(source);
+    CREATE INDEX IF NOT EXISTS idx_verdict ON properties(verdict);
   `);
+  // 旧DBにverdict列がない場合に備えてALTER TABLE（エラーは無視）
+  for (const col of ['verdict TEXT', 'verdict_benchmark REAL', 'verdict_diff REAL']) {
+    try { db.exec(`ALTER TABLE properties ADD COLUMN ${col}`); } catch { /* already exists */ }
+  }
 
-  const { source, area, date, search, propType, sort = 'newest', page = 1, limit = 50 } = filter;
+  const { source, area, date, search, propType, verdict, sort = 'newest', page = 1, limit = 50 } = filter;
   const conditions: string[] = [];
   const params: unknown[] = [];
 
@@ -154,6 +177,7 @@ function getPropertiesSqlite(filter: PropertiesFilter): { data: Property[]; tota
   if (area)     { conditions.push('area LIKE ?');          params.push(`%${area}%`); }
   if (date)     { conditions.push('date_str = ?');         params.push(date); }
   if (propType) { conditions.push('prop_name LIKE ?');     params.push(`%${propType}%`); }
+  if (verdict)  { conditions.push('verdict = ?');          params.push(verdict); }
   if (search) {
     conditions.push('(prop_name LIKE ? OR area LIKE ? OR source LIKE ?)');
     params.push(`%${search}%`, `%${search}%`, `%${search}%`);
@@ -168,7 +192,7 @@ function getPropertiesSqlite(filter: PropertiesFilter): { data: Property[]; tota
   return { data, total };
 }
 
-function getStatsSqlite(): { sources: Record<string, number>; dates: string[]; total: number; areaCounts: Record<string, number> } {
+function getStatsSqlite(): { sources: Record<string, number>; dates: string[]; total: number; areaCounts: Record<string, number>; areaVerdictCounts: AreaVerdictCounts } {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const Database = require('better-sqlite3');
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -179,12 +203,23 @@ function getStatsSqlite(): { sources: Record<string, number>; dates: string[]; t
   const dateRows = db.prepare("SELECT DISTINCT date_str FROM properties WHERE date_str IS NOT NULL ORDER BY date_str DESC LIMIT 30").all() as { date_str: string }[];
   const total = (db.prepare('SELECT COUNT(*) as cnt FROM properties').get() as { cnt: number }).cnt;
   const areaRows = db.prepare("SELECT area, COUNT(*) as cnt FROM properties WHERE area IS NOT NULL AND area != '' GROUP BY area").all() as { area: string; cnt: number }[];
+  const verdictRows = db.prepare("SELECT area, verdict, COUNT(*) as cnt FROM properties WHERE area IS NOT NULL AND verdict IS NOT NULL GROUP BY area, verdict").all() as { area: string; verdict: string; cnt: number }[];
+
+  const areaVerdictCounts: AreaVerdictCounts = {};
+  for (const r of verdictRows) {
+    if (!areaVerdictCounts[r.area]) areaVerdictCounts[r.area] = { yasui: 0, soba: 0, takai: 0, total: 0 };
+    if (r.verdict === '割安') areaVerdictCounts[r.area].yasui += r.cnt;
+    else if (r.verdict === '割高') areaVerdictCounts[r.area].takai += r.cnt;
+    else if (r.verdict === '相場並み') areaVerdictCounts[r.area].soba += r.cnt;
+    areaVerdictCounts[r.area].total += r.cnt;
+  }
 
   return {
     sources: Object.fromEntries(srcRows.map(r => [r.source, r.cnt])),
     dates: dateRows.map(r => r.date_str),
     total,
     areaCounts: Object.fromEntries(areaRows.map(r => [r.area, r.cnt])),
+    areaVerdictCounts,
   };
 }
 

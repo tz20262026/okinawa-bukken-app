@@ -1,0 +1,2 @@
+# SQLiteはローカルのみ。Vercelは必ずJSON経由で動作させる
+data/*.db
