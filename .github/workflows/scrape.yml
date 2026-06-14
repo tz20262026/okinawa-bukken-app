@@ -56,7 +56,7 @@ jobs:
           git checkout -- . 2>/dev/null || true
           git clean -fd 2>/dev/null || true
           for i in 1 2 3 4 5; do
-            git pull --rebase origin main && git push && exit 0
+            git pull --rebase origin master && git push && exit 0
             sleep $((i * 15))
           done
           exit 1
