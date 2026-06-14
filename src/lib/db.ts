@@ -41,18 +41,39 @@ export type Property = {
   scraped_at: string;
 };
 
+export type SortKey = 'newest' | 'price_asc' | 'price_desc' | 'area';
+
 export type PropertiesFilter = {
   source?: string;
   area?: string;
   date?: string;
   search?: string;
+  sort?: SortKey;
   page?: number;
   limit?: number;
 };
 
+// 価格テキスト→万円単位の数値に変換するSQL式
+const PRICE_NUM = `
+  CASE
+    WHEN price LIKE '%億%' THEN
+      CAST(REPLACE(REPLACE(REPLACE(price,'億円',''),'億',''),',','') AS REAL) * 10000
+    WHEN price LIKE '%万円%' THEN
+      CAST(REPLACE(REPLACE(REPLACE(price,'万円/月',''),'万円',''),',','') AS REAL)
+    ELSE 0
+  END
+`.trim();
+
+const ORDER_MAP: Record<SortKey, string> = {
+  newest:     'id DESC',
+  price_asc:  `(${PRICE_NUM}) ASC, id DESC`,
+  price_desc: `(${PRICE_NUM}) DESC, id DESC`,
+  area:       'area ASC, id DESC',
+};
+
 export function getProperties(filter: PropertiesFilter = {}): { data: Property[]; total: number } {
   const db = getDb();
-  const { source, area, date, search, page = 1, limit = 50 } = filter;
+  const { source, area, date, search, sort = 'newest', page = 1, limit = 50 } = filter;
 
   const conditions: string[] = [];
   const params: unknown[] = [];
@@ -66,10 +87,11 @@ export function getProperties(filter: PropertiesFilter = {}): { data: Property[]
   }
 
   const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+  const orderBy = ORDER_MAP[sort] ?? ORDER_MAP.newest;
   const offset = (page - 1) * limit;
 
   const total = (db.prepare(`SELECT COUNT(*) as cnt FROM properties ${where}`).get(...params) as { cnt: number }).cnt;
-  const data = db.prepare(`SELECT * FROM properties ${where} ORDER BY id DESC LIMIT ? OFFSET ?`).all(...params, limit, offset) as Property[];
+  const data = db.prepare(`SELECT * FROM properties ${where} ORDER BY ${orderBy} LIMIT ? OFFSET ?`).all(...params, limit, offset) as Property[];
 
   return { data, total };
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProperties, getStats } from '@/lib/db';
+import { getProperties, getStats, SortKey } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const area = searchParams.get('area') || undefined;
     const date = searchParams.get('date') || undefined;
     const search = searchParams.get('search') || undefined;
+    const sort = (searchParams.get('sort') || 'newest') as SortKey;
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '50', 10);
     const statsOnly = searchParams.get('stats') === '1';
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(stats);
     }
 
-    const result = getProperties({ source, area, date, search, page, limit });
+    const result = getProperties({ source, area, date, search, sort, page, limit });
     return NextResponse.json(result);
   } catch (e) {
     console.error('DB error:', e);

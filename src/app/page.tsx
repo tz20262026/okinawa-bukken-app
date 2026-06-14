@@ -39,6 +39,7 @@ export default function Home() {
   const [area, setArea] = useState('');
   const [date, setDate] = useState('');
   const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<'newest' | 'price_asc' | 'price_desc' | 'area'>('newest');
   const [mapOpen, setMapOpen] = useState(true);
 
   const LIMIT = 30;
@@ -59,6 +60,7 @@ export default function Home() {
       if (area) p.set('area', area);
       if (date) p.set('date', date);
       if (search) p.set('search', search);
+      p.set('sort', sort);
       p.set('page', String(page));
       p.set('limit', String(LIMIT));
       const res = await fetch(`/api/properties?${p}`);
@@ -71,12 +73,12 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, [source, area, date, search, page]);
+  }, [source, area, date, search, sort, page]);
 
   useEffect(() => { fetchStats(); }, [fetchStats]);
   useEffect(() => { fetchProperties(); }, [fetchProperties]);
 
-  const resetAll = () => { setSource(''); setArea(''); setDate(''); setSearch(''); setPage(1); };
+  const resetAll = () => { setSource(''); setArea(''); setDate(''); setSearch(''); setSort('newest'); setPage(1); };
   const hasFilter = !!(source || area || date || search);
   const totalPages = Math.ceil(total / LIMIT);
 
@@ -232,8 +234,8 @@ export default function Home() {
           )}
         </div>
 
-        {/* ─── 件数 ─── */}
-        <div className="flex items-center justify-between mb-2 px-1">
+        {/* ─── 件数 ＋ ソート ─── */}
+        <div className="flex items-center justify-between mb-2 px-1 gap-2 flex-wrap">
           <p className="text-sm text-gray-500">
             {loading
               ? <span className="text-gray-400">検索中...</span>
@@ -242,9 +244,24 @@ export default function Home() {
                 : <><span className="font-bold text-gray-700">{total}</span> 件</>
             }
           </p>
-          {!loading && total > 0 && totalPages > 1 && (
-            <p className="text-xs text-gray-400">{(page-1)*LIMIT+1}〜{Math.min(page*LIMIT,total)}件目 / 全{totalPages}ページ</p>
-          )}
+          <div className="flex items-center gap-1.5">
+            {(['newest','price_asc','price_desc','area'] as const).map(key => {
+              const labels = { newest:'🆕 新着順', price_asc:'💰 安い順', price_desc:'💎 高い順', area:'📍 エリア順' };
+              return (
+                <button
+                  key={key}
+                  onClick={() => { setSort(key); setPage(1); }}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    sort === key
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {labels[key]}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* ─── 物件一覧 ─── */}
