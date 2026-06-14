@@ -477,23 +477,26 @@ export default function Home() {
         </div>
 
         {/* ── 件数 ＋ 絞り込み ＋ ソート（リストモードのみ） ── */}
-        {viewMode === 'list' && <div className="flex items-center justify-between gap-3 flex-wrap">
-          <p className="text-sm text-slate-500">
-            {loading ? (
-              <span className="text-slate-400 animate-pulse">検索中…</span>
-            ) : (
-              <><span className="font-bold text-slate-800 text-base">{total.toLocaleString()}</span>{' '}件{hasFilter ? ' ヒット' : ''}</>
-            )}
-          </p>
+        {viewMode === 'list' && <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-slate-500">
+              {loading ? (
+                <span className="text-slate-400 animate-pulse">検索中…</span>
+              ) : (
+                <><span className="font-bold text-slate-800 text-base">{total.toLocaleString()}</span>{' '}件{hasFilter ? ' ヒット' : ''}</>
+              )}
+            </p>
+          </div>
 
-          <div className="flex items-center gap-1.5 flex-wrap justify-end">
+          {/* 絞り込み＋ソート（横スクロール） */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
             {(['割安', '相場並み', '割高'] as const).map(key => {
               const dotColor = { 割安: 'bg-emerald-500', 相場並み: 'bg-slate-400', 割高: 'bg-red-500' }[key];
               const isActive = verdict === key;
               return (
                 <button key={key}
                   onClick={() => { setVerdict(isActive ? '' : key); setPage(1); }}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                     isActive
                       ? 'bg-slate-800 text-white shadow-sm'
                       : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
@@ -505,12 +508,12 @@ export default function Home() {
               );
             })}
 
-            <span className="w-px h-5 bg-slate-200" />
+            <span className="w-px h-5 bg-slate-200 shrink-0" />
 
             {(['newest', 'price_asc', 'price_desc', 'area'] as const).map(key => (
               <button key={key}
                 onClick={() => { setSort(key); setPage(1); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                   sort === key
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
