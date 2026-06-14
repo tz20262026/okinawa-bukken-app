@@ -1,0 +1,452 @@
+[
+  {
+    "id": 45,
+    "source": "すまいずむ",
+    "prop_name": "当間アパート 2LDK",
+    "price": "5.7万円",
+    "area": "中城村",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=122750&LNO=109652/112816/5365/98622/31749&mUser=40",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 44,
+    "source": "すまいずむ",
+    "prop_name": "新城アパート 1DK",
+    "price": "3.5万円",
+    "area": "宜野湾市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=115466&LNO=122750/109652/112816/5365/98622&mUser=40",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 43,
+    "source": "すまいずむ",
+    "prop_name": "野嵩アパート 2DK",
+    "price": "4万円",
+    "area": "宜野湾市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=107081&LNO=115466/122750/109652/112816/5365&mUser=40",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 42,
+    "source": "すまいずむ",
+    "prop_name": "野嵩アパート 2DK",
+    "price": "5万円",
+    "area": "宜野湾市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=122202&LNO=107081/115466/122750/109652/112816&mUser=40",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 41,
+    "source": "すまいずむ",
+    "prop_name": "宜野湾アパート 2DK",
+    "price": "5万円",
+    "area": "宜野湾市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=104795&LNO=122202/107081/115466/122750/109652&mUser=40",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 40,
+    "source": "すまいずむ",
+    "prop_name": "大平マンション 2LDK",
+    "price": "5万円",
+    "area": "浦添市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=61383&LNO=104795/122202/107081/115466/122750&mUser=13",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 39,
+    "source": "すまいずむ",
+    "prop_name": "豊見城アパート 2DK",
+    "price": "4.3万円",
+    "area": "豊見城市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=122630&LNO=61383/104795/122202/107081/115466&mUser=2",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 38,
+    "source": "すまいずむ",
+    "prop_name": "小禄アパート 2DK",
+    "price": "4.6万円",
+    "area": "那覇市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=120374&LNO=122630/61383/104795/122202/107081&mUser=470",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 37,
+    "source": "すまいずむ",
+    "prop_name": "牧志アパート 1DK",
+    "price": "3.8万円",
+    "area": "那覇市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=106646&LNO=120374/122630/61383/104795/122202&mUser=1394",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 36,
+    "source": "すまいずむ",
+    "prop_name": "与那原一戸建 2LDKペット",
+    "price": "15万円",
+    "area": "与那原町",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=122800&LNO=106646/120374/122630/61383/104795&mUser=99",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 35,
+    "source": "すまいずむ",
+    "prop_name": "与儀アパート 1K",
+    "price": "4.9万円",
+    "area": "那覇市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=122851&LNO=122800/106646/120374/122630/61383&mUser=764",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 34,
+    "source": "すまいずむ",
+    "prop_name": "銘苅マンション 1Kペット",
+    "price": "4.7万円",
+    "area": "那覇市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=122893&LNO=122851/122800/106646/120374/122630&mUser=1367",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 33,
+    "source": "すまいずむ",
+    "prop_name": "国場アパート 1R",
+    "price": "3.3万円",
+    "area": "那覇市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=122894&LNO=122893/122851/122800/106646/120374&mUser=1367",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 32,
+    "source": "すまいずむ",
+    "prop_name": "上間アパート 4LDK",
+    "price": "7.5万円",
+    "area": "那覇市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=122140&LNO=122894/122893/122851/122800/106646&mUser=1367",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 31,
+    "source": "すまいずむ",
+    "prop_name": "新城貸間 2LDK",
+    "price": "6.5万円",
+    "area": "宜野湾市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=122895&LNO=122140/122894/122893/122851/122800&mUser=40",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 30,
+    "source": "すまいずむ",
+    "prop_name": "首里赤平町アパート 1R",
+    "price": "3.7万円",
+    "area": "那覇市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=87274&LNO=122895/122140/122894/122893/122851&mUser=21",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 29,
+    "source": "すまいずむ",
+    "prop_name": "長田アパート 3LDK",
+    "price": "7万円",
+    "area": "那覇市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=122892&LNO=87274/122895/122140/122894/122893&mUser=1367",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 28,
+    "source": "すまいずむ",
+    "prop_name": "長田アパート 1K",
+    "price": "4万円",
+    "area": "那覇市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=121983&LNO=122892/87274/122895/122140/122894&mUser=1367",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 27,
+    "source": "すまいずむ",
+    "prop_name": "国場アパート 1LDK",
+    "price": "4.3万円",
+    "area": "那覇市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=122899&LNO=121983/122892/87274/122895/122140&mUser=1367",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 26,
+    "source": "すまいずむ",
+    "prop_name": "伊祖アパート 2LDK",
+    "price": "6.8万円",
+    "area": "浦添市",
+    "url": "http://www.sumaism.net/chintai/detail01.aspx?flg_out=1&iNo=95800&LNO=122899/121983/122892/87274/122895&mUser=21",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 25,
+    "source": "goohome",
+    "prop_name": "売買一戸建て ３LDK",
+    "price": "3,588万円",
+    "area": "うるま市",
+    "url": "https://goohome.jp/kodate/888-1207/",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 24,
+    "source": "goohome",
+    "prop_name": "賃貸アパート ２LDK",
+    "price": "10万円",
+    "area": "那覇市",
+    "url": "https://goohome.jp/chintai/mansion/90-1024/",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 23,
+    "source": "goohome",
+    "prop_name": "売買一戸建て ３LDK",
+    "price": "4,050万円",
+    "area": "宜野湾市",
+    "url": "https://goohome.jp/kodate/19899-4/",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 22,
+    "source": "goohome",
+    "prop_name": "賃貸マンション ２LDK",
+    "price": "19万円",
+    "area": "宜野湾市",
+    "url": "https://goohome.jp/chintai/mansion/396-1402/",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 21,
+    "source": "goohome",
+    "prop_name": "賃貸マンション ２LDK",
+    "price": "6.8万円",
+    "area": "那覇市",
+    "url": "https://goohome.jp/chintai/mansion/3069-14198/",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 20,
+    "source": "うちなーらいふ",
+    "prop_name": "売買一戸建て 3LDK",
+    "price": "3,580万円",
+    "area": "うるま市",
+    "url": "https://www.e-uchina.net/bukken/house/h-7687-7260518-0632/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 19,
+    "source": "うちなーらいふ",
+    "prop_name": "売買土地",
+    "price": "3,800万円",
+    "area": "金武町",
+    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0231/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 18,
+    "source": "うちなーらいふ",
+    "prop_name": "売買一戸建て",
+    "price": "4,500万円",
+    "area": "恩納村",
+    "url": "https://www.e-uchina.net/bukken/house/h-6896-7260614-0232/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 17,
+    "source": "うちなーらいふ",
+    "prop_name": "売買土地",
+    "price": "1,598万円",
+    "area": "読谷村",
+    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0233/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 16,
+    "source": "うちなーらいふ",
+    "prop_name": "売買一戸建て 3LDK",
+    "price": "3,780万円",
+    "area": "うるま市",
+    "url": "https://www.e-uchina.net/bukken/house/h-7687-7260518-0491/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 15,
+    "source": "うちなーらいふ",
+    "prop_name": "売買土地",
+    "price": "6,000万円",
+    "area": "沖縄市",
+    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0234/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 14,
+    "source": "うちなーらいふ",
+    "prop_name": "売買土地",
+    "price": "2,298万円",
+    "area": "うるま市",
+    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0235/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 13,
+    "source": "うちなーらいふ",
+    "prop_name": "売買一戸建て 3LDK",
+    "price": "3,680万円",
+    "area": "うるま市",
+    "url": "https://www.e-uchina.net/bukken/house/h-7687-7260518-0581/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 12,
+    "source": "うちなーらいふ",
+    "prop_name": "売買一戸建て 2LDK",
+    "price": "5,800万円",
+    "area": "中城村",
+    "url": "https://www.e-uchina.net/bukken/house/h-6896-7260614-0236/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 11,
+    "source": "うちなーらいふ",
+    "prop_name": "売買土地",
+    "price": "1,050万円",
+    "area": "うるま市",
+    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0237/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 10,
+    "source": "うちなーらいふ",
+    "prop_name": "売買土地",
+    "price": "1,778.7万円",
+    "area": "宜野座村",
+    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0238/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 9,
+    "source": "うちなーらいふ",
+    "prop_name": "売買一戸建て 5DK",
+    "price": "4,980万円",
+    "area": "沖縄市",
+    "url": "https://www.e-uchina.net/bukken/house/h-6896-7260614-0239/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 8,
+    "source": "うちなーらいふ",
+    "prop_name": "売買土地",
+    "price": "6,316万円",
+    "area": "うるま市",
+    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0240/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 7,
+    "source": "うちなーらいふ",
+    "prop_name": "売買一戸建て 2DK",
+    "price": "900万円",
+    "area": "伊江村",
+    "url": "https://www.e-uchina.net/bukken/house/h-6987-7260121-0517/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 6,
+    "source": "うちなーらいふ",
+    "prop_name": "売買一戸建て 3LDK",
+    "price": "3,580万円",
+    "area": "うるま市",
+    "url": "https://www.e-uchina.net/bukken/house/h-7687-7260518-0636/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 5,
+    "source": "うちなーらいふ",
+    "prop_name": "売買一戸建て",
+    "price": "1億円",
+    "area": "金武町",
+    "url": "https://www.e-uchina.net/bukken/house/h-6896-7260614-0241/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 4,
+    "source": "うちなーらいふ",
+    "prop_name": "売買土地",
+    "price": "3,600万円",
+    "area": "金武町",
+    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0242/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 3,
+    "source": "うちなーらいふ",
+    "prop_name": "売買土地",
+    "price": "8,168万円",
+    "area": "うるま市",
+    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0243/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 2,
+    "source": "うちなーらいふ",
+    "prop_name": "売買一戸建て 4DK",
+    "price": "4,980万円",
+    "area": "沖縄市",
+    "url": "https://www.e-uchina.net/bukken/house/h-6896-7260614-0244/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  },
+  {
+    "id": 1,
+    "source": "うちなーらいふ",
+    "prop_name": "売買土地",
+    "price": "3,380万円",
+    "area": "那覇市",
+    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0245/detail.html",
+    "date_str": "2026-06-14",
+    "scraped_at": "2026-06-14 14:15:00"
+  }
+]

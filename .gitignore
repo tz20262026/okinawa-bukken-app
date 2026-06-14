@@ -40,9 +40,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# local database (don't commit SQLite data)
+# SQLite（ローカルのみ）
 /data/*.db
 /data/*.csv
+
+# JSON データはコミット対象（Vercel用）
+!/data/properties.json
 
 # playwright browser binaries
 /node_modules/.playwright/

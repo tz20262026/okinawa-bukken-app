@@ -230,6 +230,11 @@ async function main() {
   const rows = all.map(r => [csvEscape(r.source), csvEscape(r.propName), csvEscape(r.price), csvEscape(r.area), csvEscape(r.url)].join(','));
   fs.writeFileSync(csvPath, '﻿' + header + '\n' + rows.join('\n'), 'utf8');
 
+  // Vercel用 JSON も出力（DBから全件取得してソート）
+  const jsonPath = path.join(DATA_DIR, 'properties.json');
+  const allRows = db.prepare('SELECT * FROM properties ORDER BY id DESC').all();
+  fs.writeFileSync(jsonPath, JSON.stringify(allRows, null, 2), 'utf8');
+
   // サマリー
   console.log('\n===========================================');
   console.log('📊 結果');
@@ -239,6 +244,7 @@ async function main() {
   console.log(`  合計: ${all.length}件 (DB保存: ${saved}件)`);
   console.log(`✅ DB: ${DB_PATH}`);
   console.log(`✅ CSV: ${csvPath}`);
+  console.log(`✅ JSON: ${jsonPath}`);
 }
 
 main().catch(e => { console.error('🚨', e.message); process.exit(1); });
