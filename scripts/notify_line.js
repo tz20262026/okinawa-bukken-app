@@ -1,19 +1,18 @@
 /**
- * LINE Messaging API で割安物件（-40%以上）を通知
- * 環境変数: LINE_CHANNEL_ACCESS_TOKEN, LINE_USER_ID
+ * 割安物件（-40%以上）を通知
+ * - ntfy.sh プッシュ通知（アカウント不要、スマホアプリで受信）
+ * - LINE Messaging API（LINE_CHANNEL_ACCESS_TOKEN + LINE_USER_ID が設定済みの場合）
  */
-const fs   = require('fs');
-const path = require('path');
+const fs    = require('fs');
+const path  = require('path');
 const https = require('https');
 
-const TODAY_JSON = path.join(__dirname, '..', 'data', 'new_properties_today.json');
-const TOKEN      = process.env.LINE_CHANNEL_ACCESS_TOKEN;
-const USER_ID    = process.env.LINE_USER_ID;
+// ntfy.sh トピック（固有のランダム文字列で他人が見られないようにする）
+const NTFY_TOPIC = 'okinawa-bukken-tz20262026';
 
-if (!TOKEN || !USER_ID) {
-  console.log('⚠️ LINE_CHANNEL_ACCESS_TOKEN または LINE_USER_ID が未設定。通知をスキップ。');
-  process.exit(0);
-}
+const TODAY_JSON = path.join(__dirname, '..', 'data', 'new_properties_today.json');
+const LINE_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
+const LINE_UID   = process.env.LINE_USER_ID;
 
 if (!fs.existsSync(TODAY_JSON)) {
   console.log('new_properties_today.json がありません。スキップ。');
@@ -27,64 +26,99 @@ const bargains = newProps.filter(p =>
   p.verdict === '割安' && typeof p.verdict_diff === 'number' && p.verdict_diff <= -40
 );
 
+console.log(`新着: ${newProps.length}件 / -40%超 割安: ${bargains.length}件`);
+
 if (bargains.length === 0) {
-  console.log(`✅ 新着${newProps.length}件中、-40%超の割安物件なし。通知スキップ。`);
+  console.log('✅ -40%超の割安物件なし。通知スキップ。');
   process.exit(0);
 }
 
-console.log(`📱 -40%超 割安物件 ${bargains.length}件 → LINE通知`);
-
-function sendLine(text) {
+// ─── HTTP POST ヘルパー ──────────────────────────────────────────
+function httpPost(options, body) {
   return new Promise((resolve, reject) => {
-    const body = JSON.stringify({
-      to: USER_ID,
-      messages: [{ type: 'text', text }],
-    });
+    const data = typeof body === 'string' ? body : JSON.stringify(body);
     const req = https.request({
-      hostname: 'api.line.me',
-      path: '/v2/bot/message/push',
-      method: 'POST',
+      ...options,
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${TOKEN}`,
-        'Content-Length': Buffer.byteLength(body),
+        'Content-Length': Buffer.byteLength(data),
+        ...(options.headers || {}),
       },
     }, res => {
-      let data = '';
-      res.on('data', c => data += c);
-      res.on('end', () => {
-        if (res.statusCode === 200) resolve();
-        else reject(new Error(`LINE API ${res.statusCode}: ${data}`));
-      });
+      let resp = '';
+      res.on('data', c => resp += c);
+      res.on('end', () => resolve({ status: res.statusCode, body: resp }));
     });
     req.on('error', reject);
-    req.write(body);
+    req.write(data);
     req.end();
   });
 }
 
+// ─── ntfy.sh 通知 ───────────────────────────────────────────────
+async function sendNtfy(title, message, url) {
+  const res = await httpPost({
+    hostname: 'ntfy.sh',
+    path: `/${NTFY_TOPIC}`,
+    method: 'POST',
+    headers: {
+      'Title': encodeURIComponent(title),
+      'Priority': 'high',
+      ...(url ? { 'Click': url } : {}),
+      'Content-Type': 'text/plain; charset=utf-8',
+    },
+  }, message);
+  if (res.status !== 200) throw new Error(`ntfy ${res.status}: ${res.body}`);
+}
+
+// ─── LINE 通知 ──────────────────────────────────────────────────
+async function sendLine(text) {
+  if (!LINE_TOKEN || !LINE_UID) return;
+  const res = await httpPost({
+    hostname: 'api.line.me',
+    path: '/v2/bot/message/push',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${LINE_TOKEN}`,
+    },
+  }, JSON.stringify({ to: LINE_UID, messages: [{ type: 'text', text }] }));
+  if (res.status !== 200) throw new Error(`LINE API ${res.status}: ${res.body}`);
+}
+
+// ─── メイン ─────────────────────────────────────────────────────
 (async () => {
-  // ヘッダー通知
-  const date = new Date().toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo', month:'long', day:'numeric' });
-  await sendLine(`🏠 OKINAWA REsystem 新着アラート [${date}]\n-40%超の割安物件が ${bargains.length}件 見つかりました！`);
+  const date = new Date().toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo', month: 'long', day: 'numeric' });
+  const summary = `🏠 割安物件 ${bargains.length}件発見！ [${date}]`;
 
-  // 物件ごとに通知（最大5件）
-  for (const p of bargains.slice(0, 5)) {
-    const diff = p.verdict_diff?.toFixed(0) ?? '?';
-    const bm   = p.verdict_benchmark != null ? `相場${p.verdict_benchmark}万円` : '';
-    const msg = [
-      `📌 ${p.prop_name}`,
-      `💰 ${p.price}（${diff}% / ${bm}）`,
-      `📍 ${p.area}`,
-      `🔗 ${p.url || 'URL不明'}`,
-    ].join('\n');
-    await sendLine(msg);
-    await new Promise(r => setTimeout(r, 300));
+  // ntfy.sh ── まとめて1回
+  try {
+    const lines = bargains.slice(0, 5).map(p => {
+      const diff = p.verdict_diff?.toFixed(0) ?? '?';
+      return `${p.area} ${p.price}（${diff}%）${p.prop_name}`;
+    }).join('\n');
+    await sendNtfy(
+      summary,
+      lines + (bargains.length > 5 ? `\n…他${bargains.length - 5}件` : ''),
+      'https://okinawa-bukken-app.vercel.app'
+    );
+    console.log('✅ ntfy.sh 通知送信');
+  } catch (e) {
+    console.error('❌ ntfy.sh エラー:', e.message);
   }
 
-  if (bargains.length > 5) {
-    await sendLine(`…他 ${bargains.length - 5}件あります。サイトで全件確認 → https://okinawa-bukken-app.vercel.app`);
+  // LINE ── 個別送信（設定済みの場合のみ）
+  if (LINE_TOKEN && LINE_UID) {
+    try {
+      await sendLine(`${summary}\n\n${bargains.slice(0, 5).map(p => {
+        const diff = p.verdict_diff?.toFixed(0) ?? '?';
+        const bm   = p.verdict_benchmark != null ? `相場${p.verdict_benchmark}万円` : '';
+        return `📌 ${p.prop_name}\n💰 ${p.price}（${diff}% / ${bm}）\n📍 ${p.area}\n🔗 ${p.url || ''}`;
+      }).join('\n\n')}`);
+      console.log('✅ LINE 通知送信');
+    } catch (e) {
+      console.error('❌ LINE エラー:', e.message);
+    }
+  } else {
+    console.log('ℹ️ LINE未設定 → ntfy.sh のみ');
   }
-
-  console.log(`✅ LINE通知完了（${Math.min(bargains.length, 5)}件送信）`);
-})().catch(e => { console.error('LINE通知エラー:', e.message); process.exit(1); });
+})().catch(e => { console.error('通知エラー:', e.message); process.exit(1); });
