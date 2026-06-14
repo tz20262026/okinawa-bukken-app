@@ -188,28 +188,57 @@ export default function Home() {
               <p className="text-slate-400 text-[11px] hidden sm:block">うちなーらいふ / goohome / すまいずむ 毎日自動収集</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* 件数（PCのみ表示） */}
+            {stats && (
+              <div className="hidden sm:flex items-baseline gap-1 mr-1">
+                <span className="text-2xl font-bold text-blue-600">{stats.total.toLocaleString()}</span>
+                <span className="text-slate-400 text-sm">件</span>
+              </div>
+            )}
+
+            {/* リスト / 地図 切り替え */}
+            <div className="flex rounded-xl border border-slate-200 overflow-hidden">
+              {(['list', 'map'] as const).map(mode => (
+                <button
+                  key={mode}
+                  onClick={() => setViewMode(mode)}
+                  className={`px-2.5 sm:px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    viewMode === mode
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white text-slate-500 hover:bg-slate-50'
+                  }`}
+                >
+                  {mode === 'list' ? '📋' : '🗺️'}<span className="hidden sm:inline ml-1">{mode === 'list' ? 'リスト' : '地図'}</span>
+                </button>
+              ))}
+            </div>
+
             {/* 機能1: アラートベル */}
             <div className="relative">
               <button
                 onClick={() => setAlertOpen(v => !v)}
-                className={`relative w-9 h-9 flex items-center justify-center rounded-xl transition-colors ${
-                  alertOpen ? 'bg-amber-100' : 'bg-white border border-slate-200 hover:bg-slate-50'
+                className={`relative w-9 h-9 flex items-center justify-center rounded-xl border-2 transition-colors ${
+                  alertOpen
+                    ? 'bg-amber-100 border-amber-300'
+                    : alertCount > 0
+                      ? 'bg-amber-50 border-amber-300'
+                      : 'bg-white border-slate-200 hover:bg-slate-50'
                 }`}
                 title="新着割安物件アラート"
               >
-                <span className="text-base">🔔</span>
+                <span className="text-lg leading-none">🔔</span>
                 {alertCount > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5">
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm">
                     {alertCount > 99 ? '99+' : alertCount}
                   </span>
                 )}
               </button>
               {alertOpen && (
-                <div className="absolute right-0 top-10 bg-white rounded-2xl shadow-xl border border-slate-200 w-72 z-30 overflow-hidden">
+                <div className="absolute right-0 top-11 bg-white rounded-2xl shadow-xl border border-slate-200 w-72 z-30 overflow-hidden">
                   <div className="px-3 py-2.5 border-b border-slate-100 flex items-center justify-between">
                     <p className="text-xs font-bold text-slate-700">🔔 新着割安物件（直近24時間）</p>
-                    <button onClick={() => setAlertOpen(false)} className="text-slate-400 hover:text-slate-600 text-xs">✕</button>
+                    <button onClick={() => setAlertOpen(false)} className="text-slate-400 hover:text-slate-600 text-xs px-1">✕</button>
                   </div>
                   {alertProps.length === 0 ? (
                     <p className="text-xs text-slate-400 text-center py-5">新着なし（毎朝9時更新）</p>
@@ -239,29 +268,6 @@ export default function Home() {
                 </div>
               )}
             </div>
-
-            {/* リスト / 地図 切り替え */}
-            <div className="flex rounded-xl border border-slate-200 overflow-hidden">
-              {(['list', 'map'] as const).map(mode => (
-                <button
-                  key={mode}
-                  onClick={() => setViewMode(mode)}
-                  className={`px-3 py-1.5 text-xs font-semibold transition-colors ${
-                    viewMode === mode
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white text-slate-500 hover:bg-slate-50'
-                  }`}
-                >
-                  {mode === 'list' ? '📋 リスト' : '🗺️ 地図'}
-                </button>
-              ))}
-            </div>
-            {stats && (
-              <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-bold text-blue-600">{stats.total.toLocaleString()}</span>
-                <span className="text-slate-400 text-sm">件</span>
-              </div>
-            )}
           </div>
         </div>
       </header>
@@ -356,13 +362,14 @@ export default function Home() {
 
         {/* ── 検索・フィルターエリア ── */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          {/* 賃貸 / 売買 / 農地系 タブ */}
-          <div className="flex border-b border-slate-100 flex-wrap">
+          {/* 賃貸 / 売買 / 農地系 タブ（横スクロール対応） */}
+          <div className="flex border-b border-slate-100 overflow-x-auto scrollbar-none">
             {(
               [
                 { key: '',    label: 'すべて' },
                 { key: '賃貸', label: '🔑 賃貸' },
                 { key: '売買', label: '🏡 売買' },
+                { key: '土地', label: '🏗️ 宅地' },
                 { key: '田',   label: '🌾 田' },
                 { key: '農地', label: '🌿 農地' },
                 { key: '原野', label: '🏔️ 原野' },
@@ -371,7 +378,7 @@ export default function Home() {
               <button
                 key={key}
                 onClick={() => { setPropType(key); setPage(1); }}
-                className={`flex-1 min-w-[60px] py-2.5 text-xs sm:text-sm font-semibold transition-colors relative ${
+                className={`shrink-0 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold transition-colors relative whitespace-nowrap ${
                   propType === key
                     ? 'text-blue-600'
                     : 'text-slate-400 hover:text-slate-600'
