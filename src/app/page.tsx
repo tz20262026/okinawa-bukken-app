@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import OkinawaMap from '@/components/OkinawaMap';
+import { getVerdict, type Verdict } from '@/lib/market';
 
 type Property = {
   id: number;
@@ -28,6 +29,27 @@ const SOURCE_INFO: Record<string, { bg: string; text: string; dot: string; favic
 };
 // 後方互換用
 const SOURCE_COLORS = SOURCE_INFO;
+
+const VERDICT_STYLE: Record<Verdict, { badge: string; icon: string }> = {
+  '割安':   { badge: 'bg-emerald-100 text-emerald-700 border border-emerald-300', icon: '🟢' },
+  '相場並み': { badge: 'bg-gray-100 text-gray-500 border border-gray-200', icon: '⚪' },
+  '割高':   { badge: 'bg-red-100 text-red-600 border border-red-300', icon: '🔴' },
+};
+
+function VerdictBadge({ propName, price, area }: { propName: string; price: string; area: string }) {
+  const result = getVerdict(propName, price, area);
+  if (!result || result.verdict === '相場並み') return null;
+  const s = VERDICT_STYLE[result.verdict];
+  const sign = result.diff > 0 ? '+' : '';
+  return (
+    <span
+      title={`相場 ${result.benchmark}万円 比 ${sign}${Math.round(result.diff)}%`}
+      className={`inline-flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full ${s.badge} cursor-help`}
+    >
+      {s.icon} {result.verdict}
+    </span>
+  );
+}
 
 export default function Home() {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -316,7 +338,7 @@ export default function Home() {
                     <tr className="bg-gray-50 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide">
                       <th className="text-left px-4 py-3 font-semibold w-32">情報元</th>
                       <th className="text-left px-4 py-3 font-semibold">物件名・間取り</th>
-                      <th className="text-left px-4 py-3 font-semibold w-28">価格</th>
+                      <th className="text-left px-4 py-3 font-semibold w-36">価格</th>
                       <th className="text-left px-4 py-3 font-semibold w-24">エリア</th>
                       <th className="text-left px-4 py-3 font-semibold w-24">更新日</th>
                       <th className="px-4 py-3 w-16" />
@@ -335,7 +357,12 @@ export default function Home() {
                             </span>
                           </td>
                           <td className="px-4 py-3 font-medium text-gray-800">{p.prop_name}</td>
-                          <td className="px-4 py-3 font-bold text-red-600">{p.price}</td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-bold text-red-600">{p.price}</span>
+                              <VerdictBadge propName={p.prop_name} price={p.price} area={p.area} />
+                            </div>
+                          </td>
                           <td className="px-4 py-3">
                             <button
                               onClick={() => { setArea(area === p.area ? '' : p.area); setPage(1); }}
@@ -375,9 +402,10 @@ export default function Home() {
                         <span className="text-xs text-gray-400">{p.date_str}</span>
                       </div>
                       <p className="font-semibold text-gray-800 text-sm mb-2 leading-snug">{p.prop_name}</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-bold text-red-600">{p.price}</span>
+                          <VerdictBadge propName={p.prop_name} price={p.price} area={p.area} />
                           <button
                             onClick={() => { setArea(area === p.area ? '' : p.area); setPage(1); }}
                             className="text-blue-600 text-xs bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100"
