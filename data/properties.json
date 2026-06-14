@@ -9168,22 +9168,6 @@
     "lng": 127.666046
   },
   {
-    "id": 111,
-    "source": "うちなーらいふ",
-    "prop_name": "売買宅地",
-    "price": "2,680万円",
-    "area": "浦添市",
-    "url": "https://www.e-uchina.net/bukken/tochi/t-7785-6260614-0195/detail.html",
-    "date_str": "",
-    "scraped_at": "2026-06-14 15:00:16",
-    "verdict": "割安",
-    "verdict_benchmark": 3600,
-    "verdict_diff": -25.56,
-    "address_detail": "浦添市経塚1丁目",
-    "lat": 26.2419959,
-    "lng": 127.7235639
-  },
-  {
     "id": 110,
     "source": "うちなーらいふ",
     "prop_name": "売買マンション 2LDK",
@@ -9904,22 +9888,6 @@
     "lng": 127.7994811
   },
   {
-    "id": 46,
-    "source": "うちなーらいふ",
-    "prop_name": "売買宅地",
-    "price": "3,380万円",
-    "area": "那覇市",
-    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0257/detail.html",
-    "date_str": "",
-    "scraped_at": "2026-06-14 15:00:16",
-    "verdict": "割安",
-    "verdict_benchmark": 4200,
-    "verdict_diff": -19.52,
-    "address_detail": "那覇市",
-    "lat": 26.2122345,
-    "lng": 127.6791452
-  },
-  {
     "id": 45,
     "source": "すまいずむ",
     "prop_name": "中城村当間アパート 2LDK",
@@ -10336,22 +10304,6 @@
     "lng": 127.8462803
   },
   {
-    "id": 19,
-    "source": "うちなーらいふ",
-    "prop_name": "売買宅地",
-    "price": "3,800万円",
-    "area": "金武町",
-    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0231/detail.html",
-    "date_str": "",
-    "scraped_at": "2026-06-14 15:00:16",
-    "verdict": "割高",
-    "verdict_benchmark": 2400,
-    "verdict_diff": 58.33,
-    "address_detail": "金武町",
-    "lat": 26.4560814,
-    "lng": 127.9260347
-  },
-  {
     "id": 18,
     "source": "うちなーらいふ",
     "prop_name": "売買一戸建て",
@@ -10368,22 +10320,6 @@
     "lng": 127.8534254
   },
   {
-    "id": 17,
-    "source": "うちなーらいふ",
-    "prop_name": "売買宅地",
-    "price": "1,598万円",
-    "area": "読谷村",
-    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0233/detail.html",
-    "date_str": "",
-    "scraped_at": "2026-06-14 15:00:16",
-    "verdict": "割安",
-    "verdict_benchmark": 3000,
-    "verdict_diff": -46.73,
-    "address_detail": "読谷村",
-    "lat": 26.3961234,
-    "lng": 127.7449497
-  },
-  {
     "id": 16,
     "source": "うちなーらいふ",
     "prop_name": "売買一戸建て 3LDK",
@@ -10398,38 +10334,6 @@
     "address_detail": "うるま市前原",
     "lat": 26.3403645,
     "lng": 127.8462803
-  },
-  {
-    "id": 15,
-    "source": "うちなーらいふ",
-    "prop_name": "売買宅地",
-    "price": "6,000万円",
-    "area": "沖縄市",
-    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0234/detail.html",
-    "date_str": "",
-    "scraped_at": "2026-06-14 15:00:16",
-    "verdict": "割高",
-    "verdict_benchmark": 3200,
-    "verdict_diff": 87.5,
-    "address_detail": "沖縄市",
-    "lat": 26.3343738,
-    "lng": 127.8056597
-  },
-  {
-    "id": 14,
-    "source": "うちなーらいふ",
-    "prop_name": "売買宅地",
-    "price": "2,298万円",
-    "area": "うるま市",
-    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0235/detail.html",
-    "date_str": "",
-    "scraped_at": "2026-06-14 15:00:16",
-    "verdict": "割安",
-    "verdict_benchmark": 2800,
-    "verdict_diff": -17.93,
-    "address_detail": "うるま市",
-    "lat": 26.3791496,
-    "lng": 127.8573107
   },
   {
     "id": 13,
@@ -10464,38 +10368,6 @@
     "lng": 127.7897084
   },
   {
-    "id": 11,
-    "source": "うちなーらいふ",
-    "prop_name": "売買宅地",
-    "price": "1,050万円",
-    "area": "うるま市",
-    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0237/detail.html",
-    "date_str": "",
-    "scraped_at": "2026-06-14 15:00:16",
-    "verdict": "割安",
-    "verdict_benchmark": 2800,
-    "verdict_diff": -62.5,
-    "address_detail": "うるま市",
-    "lat": 26.3791496,
-    "lng": 127.8573107
-  },
-  {
-    "id": 10,
-    "source": "うちなーらいふ",
-    "prop_name": "売買宅地",
-    "price": "1,778.7万円",
-    "area": "宜野座村",
-    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0238/detail.html",
-    "date_str": "",
-    "scraped_at": "2026-06-14 15:00:16",
-    "verdict": "割安",
-    "verdict_benchmark": 2400,
-    "verdict_diff": -25.89,
-    "address_detail": "宜野座村",
-    "lat": 26.4816254,
-    "lng": 127.9756106
-  },
-  {
     "id": 9,
     "source": "うちなーらいふ",
     "prop_name": "売買一戸建て 5DK",
@@ -10510,22 +10382,6 @@
     "address_detail": "沖縄市",
     "lat": 26.3343738,
     "lng": 127.8056597
-  },
-  {
-    "id": 8,
-    "source": "うちなーらいふ",
-    "prop_name": "売買宅地",
-    "price": "6,316万円",
-    "area": "うるま市",
-    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0240/detail.html",
-    "date_str": "",
-    "scraped_at": "2026-06-14 15:00:16",
-    "verdict": "割高",
-    "verdict_benchmark": 2800,
-    "verdict_diff": 125.57,
-    "address_detail": "うるま市",
-    "lat": 26.3791496,
-    "lng": 127.8573107
   },
   {
     "id": 7,
@@ -10576,38 +10432,6 @@
     "lng": 127.9260347
   },
   {
-    "id": 4,
-    "source": "うちなーらいふ",
-    "prop_name": "売買宅地",
-    "price": "3,600万円",
-    "area": "金武町",
-    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0242/detail.html",
-    "date_str": "",
-    "scraped_at": "2026-06-14 15:00:16",
-    "verdict": "割高",
-    "verdict_benchmark": 2400,
-    "verdict_diff": 50,
-    "address_detail": "金武町",
-    "lat": 26.4560814,
-    "lng": 127.9260347
-  },
-  {
-    "id": 3,
-    "source": "うちなーらいふ",
-    "prop_name": "売買宅地",
-    "price": "8,168万円",
-    "area": "うるま市",
-    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0243/detail.html",
-    "date_str": "",
-    "scraped_at": "2026-06-14 15:00:16",
-    "verdict": "割高",
-    "verdict_benchmark": 2800,
-    "verdict_diff": 191.71,
-    "address_detail": "うるま市",
-    "lat": 26.3791496,
-    "lng": 127.8573107
-  },
-  {
     "id": 2,
     "source": "うちなーらいふ",
     "prop_name": "売買一戸建て 4DK",
@@ -10622,22 +10446,6 @@
     "address_detail": "沖縄市",
     "lat": 26.3343738,
     "lng": 127.8056597
-  },
-  {
-    "id": 1,
-    "source": "うちなーらいふ",
-    "prop_name": "売買宅地",
-    "price": "3,380万円",
-    "area": "那覇市",
-    "url": "https://www.e-uchina.net/bukken/tochi/t-6896-6260614-0245/detail.html",
-    "date_str": "2026-06-14",
-    "scraped_at": "2026-06-14 14:15:00",
-    "verdict": "割安",
-    "verdict_benchmark": 4200,
-    "verdict_diff": -19.52,
-    "address_detail": "那覇市",
-    "lat": 26.2122345,
-    "lng": 127.6791452
   },
   {
     "id": 733,
