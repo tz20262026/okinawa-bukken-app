@@ -48,6 +48,7 @@ export type PropertiesFilter = {
   area?: string;
   date?: string;
   search?: string;
+  propType?: string;
   sort?: SortKey;
   page?: number;
   limit?: number;
@@ -73,7 +74,7 @@ const ORDER_MAP: Record<SortKey, string> = {
 
 export function getProperties(filter: PropertiesFilter = {}): { data: Property[]; total: number } {
   const db = getDb();
-  const { source, area, date, search, sort = 'newest', page = 1, limit = 50 } = filter;
+  const { source, area, date, search, propType, sort = 'newest', page = 1, limit = 50 } = filter;
 
   const conditions: string[] = [];
   const params: unknown[] = [];
@@ -81,6 +82,7 @@ export function getProperties(filter: PropertiesFilter = {}): { data: Property[]
   if (source) { conditions.push('source = ?'); params.push(source); }
   if (area) { conditions.push('area LIKE ?'); params.push(`%${area}%`); }
   if (date) { conditions.push('date_str = ?'); params.push(date); }
+  if (propType) { conditions.push('prop_name LIKE ?'); params.push(`%${propType}%`); }
   if (search) {
     conditions.push('(prop_name LIKE ? OR area LIKE ? OR source LIKE ?)');
     params.push(`%${search}%`, `%${search}%`, `%${search}%`);

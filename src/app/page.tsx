@@ -40,6 +40,7 @@ export default function Home() {
   const [date, setDate] = useState('');
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<'newest' | 'price_asc' | 'price_desc' | 'area'>('newest');
+  const [propType, setPropType] = useState(''); // '賃貸' | '売買' | ''
   const [mapOpen, setMapOpen] = useState(true);
 
   const LIMIT = 30;
@@ -60,6 +61,7 @@ export default function Home() {
       if (area) p.set('area', area);
       if (date) p.set('date', date);
       if (search) p.set('search', search);
+      if (propType) p.set('propType', propType);
       p.set('sort', sort);
       p.set('page', String(page));
       p.set('limit', String(LIMIT));
@@ -73,13 +75,13 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, [source, area, date, search, sort, page]);
+  }, [source, area, date, search, sort, propType, page]);
 
   useEffect(() => { fetchStats(); }, [fetchStats]);
   useEffect(() => { fetchProperties(); }, [fetchProperties]);
 
-  const resetAll = () => { setSource(''); setArea(''); setDate(''); setSearch(''); setSort('newest'); setPage(1); };
-  const hasFilter = !!(source || area || date || search);
+  const resetAll = () => { setSource(''); setArea(''); setDate(''); setSearch(''); setSort('newest'); setPropType(''); setPage(1); };
+  const hasFilter = !!(source || area || date || search || propType);
   const totalPages = Math.ceil(total / LIMIT);
 
   const today = new Date();
@@ -135,6 +137,22 @@ export default function Home() {
 
         {/* ─── 検索バー ─── */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 mb-4">
+          {/* 賃貸/売買 タブ */}
+          <div className="flex gap-1.5 mb-3">
+            {[{ key: '', label: '🏠 すべて' }, { key: '賃貸', label: '🔑 賃貸' }, { key: '売買', label: '🏡 売買' }].map(t => (
+              <button
+                key={t.key}
+                onClick={() => { setPropType(t.key); setPage(1); }}
+                className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all ${
+                  propType === t.key
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
           <div className="flex flex-col sm:flex-row gap-2">
             {/* キーワード検索（入力即反映） */}
             <div className="relative flex-1">
@@ -180,6 +198,12 @@ export default function Home() {
           {/* 現在の絞り込み状態 */}
           {hasFilter && (
             <div className="flex flex-wrap gap-1.5 mt-2.5">
+              {propType && (
+                <span className="flex items-center gap-1 bg-blue-100 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                  {propType === '賃貸' ? '🔑' : '🏡'} {propType}
+                  <button onClick={() => { setPropType(''); setPage(1); }} className="hover:text-blue-900 font-bold">×</button>
+                </span>
+              )}
               {source && (
                 <span className="flex items-center gap-1 bg-blue-100 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full">
                   {source}
