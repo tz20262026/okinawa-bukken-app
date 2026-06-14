@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
     const source = searchParams.get('source') || undefined;
     const area = searchParams.get('area') || undefined;
     const date = searchParams.get('date') || undefined;
+    const period = searchParams.get('period') || undefined;
     const search = searchParams.get('search') || undefined;
     const sort = (searchParams.get('sort') || 'newest') as SortKey;
     const propType = searchParams.get('propType') || undefined;
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(stats);
     }
 
-    const result = getProperties({ source, area, date, search, propType, verdict, sort, page, limit });
+    const result = getProperties({ source, area, date, period, search, propType, verdict, sort, page, limit });
     return NextResponse.json(result);
   } catch (e) {
     console.error('DB error:', e);

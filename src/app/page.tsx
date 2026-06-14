@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import OkinawaMap from '@/components/OkinawaMap';
+import VerdictDetail from '@/components/VerdictDetail';
 import { getVerdict } from '@/lib/market';
 
 const LeafletMap = dynamic(() => import('@/components/LeafletMap'), { ssr: false });
@@ -18,6 +19,15 @@ type Property = {
   scraped_at: string;
   verdict: string | null;
   verdict_benchmark: number | null;
+  verdict_diff: number | null;
+};
+
+type AlertProperty = {
+  id: number;
+  prop_name: string;
+  price: string;
+  area: string;
+  url: string;
   verdict_diff: number | null;
 };
 
@@ -70,13 +80,21 @@ export default function Home() {
   const [page, setPage]     = useState(1);
   const [source, setSource] = useState('');
   const [area, setArea]     = useState('');
-  const [date, setDate]     = useState('');
+  const [period, setPeriod] = useState('');
   const [search, setSearch] = useState('');
   const [sort, setSort]     = useState<SortKey>('newest');
   const [propType, setPropType] = useState('');
   const [verdict, setVerdict]   = useState('');
   const [mapOpen, setMapOpen]   = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+
+  // 機能2: 判定根拠モーダル
+  const [selectedProp, setSelectedProp] = useState<Property | null>(null);
+
+  // 機能1: バーストアラート
+  const [alertCount, setAlertCount] = useState(0);
+  const [alertOpen, setAlertOpen]   = useState(false);
+  const [alertProps, setAlertProps] = useState<AlertProperty[]>([]);
 
   const LIMIT = 30;
 
@@ -93,7 +111,7 @@ export default function Home() {
       const p = new URLSearchParams();
       if (source)   p.set('source', source);
       if (area)     p.set('area', area);
-      if (date)     p.set('date', date);
+      if (period)   p.set('period', period);
       if (search)   p.set('search', search);
       if (propType) p.set('propType', propType);
       if (verdict)  p.set('verdict', verdict);
@@ -110,17 +128,29 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, [source, area, date, search, sort, propType, verdict, page]);
+  }, [source, area, period, search, sort, propType, verdict, page]);
+
+  // 機能1: アラートポーリング（5分おき）
+  const checkAlerts = useCallback(async () => {
+    try {
+      const res = await fetch('/api/alert');
+      const data = await res.json();
+      setAlertCount(data.count || 0);
+      setAlertProps(data.properties || []);
+    } catch {}
+  }, []);
 
   useEffect(() => { fetchStats(); },      [fetchStats]);
   useEffect(() => { fetchProperties(); }, [fetchProperties]);
+  useEffect(() => {
+    checkAlerts();
+    const id = setInterval(checkAlerts, 5 * 60 * 1000);
+    return () => clearInterval(id);
+  }, [checkAlerts]);
 
-  const resetAll  = () => { setSource(''); setArea(''); setDate(''); setSearch(''); setSort('newest'); setPropType(''); setVerdict(''); setPage(1); };
-  const hasFilter = !!(source || area || date || search || propType || verdict);
+  const resetAll  = () => { setSource(''); setArea(''); setPeriod(''); setSearch(''); setSort('newest'); setPropType(''); setVerdict(''); setPage(1); };
+  const hasFilter = !!(source || area || period || search || propType || verdict);
   const totalPages = Math.ceil(total / LIMIT);
-
-  const today    = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
   type FilterChip = { label: string; onRemove: () => void; color: string };
   const activeFilters: FilterChip[] = [
@@ -129,13 +159,22 @@ export default function Home() {
     source   ? { label: source,   onRemove: () => setSource(''),   color: 'bg-slate-100 text-slate-700' } : null,
     area     ? { label: `📍 ${area}`, onRemove: () => setArea(''), color: 'bg-violet-50 text-violet-700' } : null,
     search   ? { label: `"${search}"`, onRemove: () => setSearch(''), color: 'bg-amber-50 text-amber-700' } : null,
-    date     ? { label: date,     onRemove: () => setDate(''),     color: 'bg-green-50 text-green-700' } : null,
+    period   ? { label: period === '3months' ? '直近3ヶ月' : '直近1年', onRemove: () => setPeriod(''), color: 'bg-green-50 text-green-700' } : null,
   ].filter((f): f is FilterChip => f !== null);
 
   const SORT_LABELS: Record<SortKey, string> = { newest: '新着順', price_asc: '安い順', price_desc: '高い順', area: 'エリア順' };
 
   return (
     <div className="min-h-screen bg-slate-50">
+
+      {/* 機能2: 判定根拠モーダル */}
+      {selectedProp && (
+        <VerdictDetail
+          property={selectedProp}
+          areaProperties={properties}
+          onClose={() => setSelectedProp(null)}
+        />
+      )}
 
       {/* ── ヘッダー ── */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
@@ -149,7 +188,58 @@ export default function Home() {
               <p className="text-slate-400 text-[11px] hidden sm:block">うちなーらいふ / goohome / すまいずむ 毎日自動収集</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
+            {/* 機能1: アラートベル */}
+            <div className="relative">
+              <button
+                onClick={() => setAlertOpen(v => !v)}
+                className={`relative w-9 h-9 flex items-center justify-center rounded-xl transition-colors ${
+                  alertOpen ? 'bg-amber-100' : 'bg-white border border-slate-200 hover:bg-slate-50'
+                }`}
+                title="新着割安物件アラート"
+              >
+                <span className="text-base">🔔</span>
+                {alertCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5">
+                    {alertCount > 99 ? '99+' : alertCount}
+                  </span>
+                )}
+              </button>
+              {alertOpen && (
+                <div className="absolute right-0 top-10 bg-white rounded-2xl shadow-xl border border-slate-200 w-72 z-30 overflow-hidden">
+                  <div className="px-3 py-2.5 border-b border-slate-100 flex items-center justify-between">
+                    <p className="text-xs font-bold text-slate-700">🔔 新着割安物件（直近24時間）</p>
+                    <button onClick={() => setAlertOpen(false)} className="text-slate-400 hover:text-slate-600 text-xs">✕</button>
+                  </div>
+                  {alertProps.length === 0 ? (
+                    <p className="text-xs text-slate-400 text-center py-5">新着なし（毎朝9時更新）</p>
+                  ) : (
+                    <div className="divide-y divide-slate-50 max-h-72 overflow-y-auto">
+                      {alertProps.map(p => (
+                        <div key={p.id} className="px-3 py-2.5">
+                          <p className="text-xs font-semibold text-slate-800 line-clamp-1 mb-0.5">{p.prop_name}</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-emerald-600">{p.price}</span>
+                            <span className="text-[10px] text-slate-400">{p.area}</span>
+                            {p.verdict_diff !== null && (
+                              <span className="text-[10px] font-semibold text-emerald-600 ml-auto">
+                                {p.verdict_diff.toFixed(1)}%
+                              </span>
+                            )}
+                            {p.url && (
+                              <a href={p.url} target="_blank" rel="noopener noreferrer"
+                                className="text-[10px] text-blue-500 hover:underline shrink-0">→</a>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-[9px] text-slate-300 text-center py-1.5">5分おきに自動更新</p>
+                </div>
+              )}
+            </div>
+
             {/* リスト / 地図 切り替え */}
             <div className="flex rounded-xl border border-slate-200 overflow-hidden">
               {(['list', 'map'] as const).map(mode => (
@@ -209,7 +299,6 @@ export default function Home() {
                 />
               )}
             </div>
-            {/* 地図の下に物件リスト（簡易版） */}
             <div className="border-t border-slate-100 p-3">
               <p className="text-xs text-slate-500 mb-2">
                 {area ? `${area} の物件` : '全エリアの物件'} — <span className="font-bold text-slate-800">{total}</span>件
@@ -297,7 +386,7 @@ export default function Home() {
           </div>
 
           <div className="p-3 space-y-2.5">
-            {/* 検索 + 日付 */}
+            {/* 検索 + 期間フィルター（機能3） */}
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -322,14 +411,13 @@ export default function Home() {
                 )}
               </div>
               <select
-                value={date}
-                onChange={e => { setDate(e.target.value); setPage(1); }}
-                className="border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shrink-0 max-w-[140px] sm:max-w-none"
+                value={period}
+                onChange={e => { setPeriod(e.target.value); setPage(1); }}
+                className="border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shrink-0"
               >
                 <option value="">📅 全期間</option>
-                {stats?.dates.map(d => (
-                  <option key={d} value={d}>{d === todayStr ? `${d}（今日）` : d}</option>
-                ))}
+                <option value="1year">📅 直近1年</option>
+                <option value="3months">📅 直近3ヶ月</option>
               </select>
             </div>
 
@@ -392,7 +480,6 @@ export default function Home() {
           </p>
 
           <div className="flex items-center gap-1.5 flex-wrap justify-end">
-            {/* 割安/相場/割高フィルター */}
             {(['割安', '相場並み', '割高'] as const).map(key => {
               const dotColor = { 割安: 'bg-emerald-500', 相場並み: 'bg-slate-400', 割高: 'bg-red-500' }[key];
               const isActive = verdict === key;
@@ -413,7 +500,6 @@ export default function Home() {
 
             <span className="w-px h-5 bg-slate-200" />
 
-            {/* ソート */}
             {(['newest', 'price_asc', 'price_desc', 'area'] as const).map(key => (
               <button key={key}
                 onClick={() => { setSort(key); setPage(1); }}
@@ -426,6 +512,13 @@ export default function Home() {
             ))}
           </div>
         </div>}
+
+        {/* 機能2: 根拠クリックヒント */}
+        {viewMode === 'list' && !loading && properties.length > 0 && (
+          <p className="text-[11px] text-slate-400 text-right -mt-1">
+            💡 行クリック → 割安・割高の判定根拠を表示
+          </p>
+        )}
 
         {/* ── 物件一覧（リストモードのみ） ── */}
         {viewMode === 'list' && <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -447,7 +540,7 @@ export default function Home() {
             </div>
           ) : (
             <>
-              {/* PC テーブル（コンパクト・横スクロールなし） */}
+              {/* PC テーブル */}
               <div className="hidden sm:block">
                 <table className="w-full table-fixed">
                   <thead>
@@ -463,8 +556,11 @@ export default function Home() {
                     {properties.map(p => {
                       const c = SOURCE_COLORS[p.source] ?? { dot: '#6B7280', badge: 'bg-slate-100 text-slate-600', favicon: '' };
                       return (
-                        <tr key={p.id} className="hover:bg-blue-50/30 transition-colors group">
-                          {/* 情報元 + 物件名 */}
+                        <tr
+                          key={p.id}
+                          className="hover:bg-blue-50/30 transition-colors group cursor-pointer"
+                          onClick={() => setSelectedProp(p)}
+                        >
                           <td className="pl-4 pr-2 py-2.5">
                             <div className="flex items-center gap-1.5 mb-0.5">
                               <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: c.dot }} />
@@ -472,26 +568,23 @@ export default function Home() {
                             </div>
                             <p className="text-xs font-medium text-slate-800 line-clamp-1 leading-snug">{p.prop_name}</p>
                           </td>
-                          {/* 価格 + バッジ（横並び） */}
                           <td className="px-2 py-2.5">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-bold text-slate-800 text-sm whitespace-nowrap">{p.price}</span>
                               <VerdictBadge prop={p} />
                             </div>
                           </td>
-                          {/* エリア */}
                           <td className="px-2 py-2.5">
                             <button
-                              onClick={() => { setArea(area === p.area ? '' : p.area); setPage(1); }}
+                              onClick={e => { e.stopPropagation(); setArea(area === p.area ? '' : p.area); setPage(1); }}
                               className="text-xs text-indigo-600 hover:text-indigo-800 font-medium hover:underline underline-offset-2 text-left"
                             >{p.area}</button>
                           </td>
-                          {/* 更新日 */}
                           <td className="px-2 py-2.5 text-[11px] text-slate-600 whitespace-nowrap">{p.date_str || '—'}</td>
-                          {/* 詳細リンク */}
                           <td className="pr-4 py-2.5 text-right">
                             {p.url ? (
                               <a href={p.url} target="_blank" rel="noopener noreferrer"
+                                onClick={e => e.stopPropagation()}
                                 className="text-[11px] font-semibold text-blue-500 hover:text-blue-700 whitespace-nowrap">
                                 →
                               </a>
@@ -509,8 +602,11 @@ export default function Home() {
                 {properties.map(p => {
                   const c = SOURCE_COLORS[p.source] ?? { dot: '#6B7280', badge: 'bg-slate-100 text-slate-600', favicon: '' };
                   return (
-                    <div key={p.id} className="p-4 active:bg-slate-50 transition-colors">
-                      {/* ソース + 日付 */}
+                    <div
+                      key={p.id}
+                      className="p-4 active:bg-slate-50 transition-colors cursor-pointer"
+                      onClick={() => setSelectedProp(p)}
+                    >
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-md ${c.badge}`}>
                           <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: c.dot }} />
@@ -518,9 +614,7 @@ export default function Home() {
                         </span>
                         <span className="text-xs text-slate-400 shrink-0">{p.date_str || '—'}</span>
                       </div>
-                      {/* 物件名 */}
                       <p className="text-sm font-semibold text-slate-800 mb-2.5 leading-snug">{p.prop_name}</p>
-                      {/* 価格 + エリア + リンク */}
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 flex-wrap min-w-0">
                           <span className="font-bold text-slate-800 text-sm shrink-0">{p.price}</span>
@@ -528,11 +622,12 @@ export default function Home() {
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0">
                           <button
-                            onClick={() => { setArea(area === p.area ? '' : p.area); setPage(1); }}
+                            onClick={e => { e.stopPropagation(); setArea(area === p.area ? '' : p.area); setPage(1); }}
                             className="text-xs text-violet-600 bg-violet-50 hover:bg-violet-100 px-2 py-1 rounded-lg font-medium transition-colors"
                           >{p.area}</button>
                           {p.url && (
                             <a href={p.url} target="_blank" rel="noopener noreferrer"
+                              onClick={e => e.stopPropagation()}
                               className="text-xs text-blue-600 font-semibold bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-lg transition-colors">
                               詳細 →
                             </a>

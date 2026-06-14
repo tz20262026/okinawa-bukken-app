@@ -28,6 +28,7 @@ export type PropertiesFilter = {
   source?: string;
   area?: string;
   date?: string;
+  period?: string;
   search?: string;
   propType?: string;
   verdict?: string;
@@ -62,11 +63,19 @@ function getAllFromJson(): Property[] {
 }
 
 function filterAndSort(all: Property[], filter: PropertiesFilter): { data: Property[]; total: number } {
-  const { source, area, date, search, propType, verdict, sort = 'newest', page = 1, limit = 50 } = filter;
+  const { source, area, date, period, search, propType, verdict, sort = 'newest', page = 1, limit = 50 } = filter;
   let rows = all;
   if (source) rows = rows.filter(r => r.source === source);
   if (area) rows = rows.filter(r => r.area?.includes(area));
   if (date) rows = rows.filter(r => r.date_str === date);
+  if (period) {
+    const now = new Date();
+    const cutoff = period === '3months'
+      ? new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
+      : new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+    const cutoffStr = cutoff.toISOString().split('T')[0];
+    rows = rows.filter(r => ((r.scraped_at || r.date_str || '').slice(0, 10)) >= cutoffStr);
+  }
   if (propType) rows = rows.filter(r => r.prop_name?.includes(propType));
   if (verdict) rows = rows.filter(r => r.verdict === verdict);
   if (search) {
@@ -169,13 +178,17 @@ function getPropertiesSqlite(filter: PropertiesFilter): { data: Property[]; tota
     try { db.exec(`ALTER TABLE properties ADD COLUMN ${col}`); } catch { /* already exists */ }
   }
 
-  const { source, area, date, search, propType, verdict, sort = 'newest', page = 1, limit = 50 } = filter;
+  const { source, area, date, period, search, propType, verdict, sort = 'newest', page = 1, limit = 50 } = filter;
   const conditions: string[] = [];
   const params: unknown[] = [];
 
   if (source)   { conditions.push('source = ?');           params.push(source); }
   if (area)     { conditions.push('area LIKE ?');          params.push(`%${area}%`); }
   if (date)     { conditions.push('date_str = ?');         params.push(date); }
+  if (period) {
+    const interval = period === '3months' ? '-3 months' : '-1 year';
+    conditions.push(`coalesce(scraped_at, date_str) >= date('now', '${interval}')`);
+  }
   if (propType) { conditions.push('prop_name LIKE ?');     params.push(`%${propType}%`); }
   if (verdict)  { conditions.push('verdict = ?');          params.push(verdict); }
   if (search) {
