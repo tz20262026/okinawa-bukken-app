@@ -74,15 +74,17 @@ export function getProperties(filter: PropertiesFilter = {}): { data: Property[]
   return { data, total };
 }
 
-export function getStats(): { sources: Record<string, number>; dates: string[]; total: number } {
+export function getStats(): { sources: Record<string, number>; dates: string[]; total: number; areaCounts: Record<string, number> } {
   const db = getDb();
   const srcRows = db.prepare('SELECT source, COUNT(*) as cnt FROM properties GROUP BY source').all() as { source: string; cnt: number }[];
   const dateRows = db.prepare("SELECT DISTINCT date_str FROM properties WHERE date_str IS NOT NULL ORDER BY date_str DESC LIMIT 30").all() as { date_str: string }[];
   const total = (db.prepare('SELECT COUNT(*) as cnt FROM properties').get() as { cnt: number }).cnt;
+  const areaRows = db.prepare("SELECT area, COUNT(*) as cnt FROM properties WHERE area IS NOT NULL AND area != '' GROUP BY area").all() as { area: string; cnt: number }[];
 
   return {
     sources: Object.fromEntries(srcRows.map(r => [r.source, r.cnt])),
     dates: dateRows.map(r => r.date_str),
     total,
+    areaCounts: Object.fromEntries(areaRows.map(r => [r.area, r.cnt])),
   };
 }
