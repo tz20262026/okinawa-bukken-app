@@ -366,13 +366,14 @@ export default function Home() {
           <div className="flex border-b border-slate-100 overflow-x-auto scrollbar-none">
             {(
               [
-                { key: '',    label: 'すべて' },
-                { key: '賃貸', label: '🔑 賃貸' },
-                { key: '売買', label: '🏡 売買' },
-                { key: '土地', label: '🏗️ 宅地' },
-                { key: '田',   label: '🌾 田' },
-                { key: '農地', label: '🌿 農地' },
-                { key: '原野', label: '🏔️ 原野' },
+                { key: '',      label: 'すべて' },
+                { key: '賃貸',  label: '🔑 賃貸' },
+                { key: '売買',  label: '🏡 売買' },
+                { key: '宅地',  label: '🏗️ 宅地' },
+                { key: '雑種地',label: '🟫 雑種地' },
+                { key: '田',    label: '🌾 田' },
+                { key: '農地',  label: '🌿 農地' },
+                { key: '原野',  label: '🏔️ 原野' },
               ] as const
             ).map(({ key, label }) => (
               <button
