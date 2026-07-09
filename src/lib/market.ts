@@ -75,6 +75,15 @@ type VerdictResult = {
 };
 
 /**
+ * 相場比が信頼できる範囲かどうか
+ * 大規模区画の土地・シェア物件・軍用地など、単純な平均相場との比較が
+ * 意味をなさないケースで極端な%（数百〜数千%）が出るのを防ぐガード
+ */
+export function isReliableDiff(diff: number): boolean {
+  return diff >= -85 && diff <= 150;
+}
+
+/**
  * 間取りから賃料補正倍率を返す（1K基準 = 1.0）
  * 1K/1DK=1.0, 1LDK=1.25, 2DK/2LDK=1.55, 3DK/3LDK=1.95, 4LDK+=2.4
  */
@@ -94,8 +103,8 @@ export function getVerdict(propName: string, price: string, area: string): Verdi
   const priceNum = parsePriceMan(price);
   if (priceNum === null) return null;
 
-  // 商業・業務物件・収益投資物件は判定不能
-  if (/店舗|事務所|倉庫|工場|駐車場|売アパート|売ビル|一棟|収益物件/.test(propName)) return null;
+  // 商業・業務物件・収益投資物件・軍用地（通常の売買相場と市場が異なる）は判定不能
+  if (/店舗|事務所|倉庫|工場|駐車場|売アパート|売ビル|一棟|収益物件|軍用地/.test(propName)) return null;
 
   // 売買を最優先判定（「売買マンション」「売アパート」は売買扱い）
   const isSaleProp = /売買|^売/.test(propName);
@@ -119,6 +128,7 @@ export function getVerdict(propName: string, price: string, area: string): Verdi
   }
 
   const diff = ((priceNum - benchmark) / benchmark) * 100;
+  if (!isReliableDiff(diff)) return null;
 
   let verdict: Verdict;
   if (diff <= -15)  verdict = '割安';

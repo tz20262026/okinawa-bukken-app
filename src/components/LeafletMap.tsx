@@ -150,7 +150,7 @@ export default function LeafletMap({ properties, selectedArea, onAreaSelect, are
                       </span>
                     )}
                   </div>
-                  <div className="text-slate-400">{p.source} · {p.date_str}</div>
+                  <div className="text-slate-400">{p.source} · {(p.date_str || p.scraped_at || '').slice(0, 10)}</div>
                   {p.url && (
                     <a href={p.url} target="_blank" rel="noopener noreferrer"
                       className="inline-block mt-1 text-blue-500 hover:underline font-semibold">

@@ -69,8 +69,8 @@ function calcVerdict(propName, price, area) {
   const priceNum = parsePriceMan(price);
   if (priceNum === null) return { verdict: null, verdict_benchmark: null, verdict_diff: null };
 
-  // 商業・業務・収益投資物件は判定しない
-  if (/店舗|事務所|倉庫|工場|駐車場|売アパート|売ビル|一棟|収益物件/.test(propName || '')) {
+  // 商業・業務・収益投資物件・軍用地（通常の売買相場と市場が異なる）は判定しない
+  if (/店舗|事務所|倉庫|工場|駐車場|売アパート|売ビル|一棟|収益物件|軍用地/.test(propName || '')) {
     return { verdict: null, verdict_benchmark: null, verdict_diff: null };
   }
 
@@ -93,7 +93,13 @@ function calcVerdict(propName, price, area) {
     benchmark = m.sale;
   }
 
-  const diff    = ((priceNum - benchmark) / benchmark) * 100;
+  const diff = ((priceNum - benchmark) / benchmark) * 100;
+
+  // 相場比が信頼できる範囲外（大規模区画・シェア物件などの外れ値）は判定不能扱い
+  if (diff < -85 || diff > 150) {
+    return { verdict: null, verdict_benchmark: null, verdict_diff: null };
+  }
+
   const verdict = diff <= -15 ? '割安' : diff >= 15 ? '割高' : '相場並み';
 
   return {

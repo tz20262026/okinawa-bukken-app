@@ -81,7 +81,7 @@ export default function VerdictDetail({ property, areaProperties, onClose }: Pro
             <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold border ${verdictCls}`}>
               {verdict}
               {diff !== null && (
-                <span className="text-xs font-normal opacity-70">（相場比 {diff > 0 ? '+' : ''}{diff.toFixed(1)}%）</span>
+                <span className="text-xs font-normal opacity-70">（相場比 {diff > 0 ? '+' : ''}{Math.round(diff)}%）</span>
               )}
             </div>
           )}

@@ -57,7 +57,7 @@ function rentMultiplier(n) {
 function calcVerdict(propName, price, area) {
   const m = MARKET_2026[area];
   if (!m) return { verdict:null, verdict_benchmark:null, verdict_diff:null };
-  if (/店舗|事務所|倉庫|工場|駐車場|売アパート|売ビル|一棟|収益物件/.test(propName||''))
+  if (/店舗|事務所|倉庫|工場|駐車場|売アパート|売ビル|一棟|収益物件|軍用地/.test(propName||''))
     return { verdict:null, verdict_benchmark:null, verdict_diff:null };
   const p = parsePriceMan(price);
   if (p===null) return { verdict:null, verdict_benchmark:null, verdict_diff:null };
@@ -69,6 +69,8 @@ function calcVerdict(propName, price, area) {
   );
   const bm = isRent ? m.rent * rentMultiplier(propName||'') : isLand ? m.land : m.sale;
   const diff = ((p - bm) / bm) * 100;
+  // 相場比が信頼できる範囲外（大規模区画・シェア物件などの外れ値）は判定不能扱い
+  if (diff < -85 || diff > 150) return { verdict:null, verdict_benchmark:null, verdict_diff:null };
   return {
     verdict: diff<=-15?'割安':diff>=15?'割高':'相場並み',
     verdict_benchmark: Math.round(bm*100)/100,

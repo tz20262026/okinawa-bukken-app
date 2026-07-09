@@ -55,19 +55,25 @@ const VERDICT_CFG = {
   '割高':   { cls: 'bg-red-50 text-red-600 border border-red-200',             dot: 'bg-red-500' },
 } as const;
 
+// 情報元サイトの掲載日が取れない物件も多いため、取得日で補完して表示する
+function displayDate(p: Property): string {
+  return (p.date_str || p.scraped_at || '').slice(0, 10) || '—';
+}
+
 function VerdictBadge({ prop }: { prop: Property }) {
   const v    = prop.verdict          ?? getVerdict(prop.prop_name, prop.price, prop.area)?.verdict   ?? null;
   const bench = prop.verdict_benchmark ?? getVerdict(prop.prop_name, prop.price, prop.area)?.benchmark ?? null;
   const diff  = prop.verdict_diff      ?? getVerdict(prop.prop_name, prop.price, prop.area)?.diff      ?? null;
   if (!v || !(v in VERDICT_CFG)) return null;
   const cfg = VERDICT_CFG[v as keyof typeof VERDICT_CFG];
-  const sign = (diff ?? 0) > 0 ? '+' : '';
-  const tip  = bench ? `相場 ${bench}万円 比 ${sign}${diff}%` : '';
+  const diffRounded = diff !== null ? Math.round(diff as number) : null;
+  const sign = (diffRounded ?? 0) > 0 ? '+' : '';
+  const tip  = bench ? `相場 ${bench}万円 比 ${sign}${diffRounded}%` : '';
   return (
     <span title={tip} className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md cursor-help ${cfg.cls}`}>
       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg.dot}`} />
       {v}
-      {diff !== null && <span className="opacity-60">{sign}{(diff as number).toFixed(2)}%</span>}
+      {diffRounded !== null && <span className="opacity-60 tabular-nums">{sign}{diffRounded}%</span>}
     </span>
   );
 }
@@ -251,8 +257,8 @@ export default function Home() {
                             <span className="text-xs font-bold text-emerald-600">{p.price}</span>
                             <span className="text-[10px] text-slate-400">{p.area}</span>
                             {p.verdict_diff !== null && (
-                              <span className="text-[10px] font-semibold text-emerald-600 ml-auto">
-                                {p.verdict_diff.toFixed(1)}%
+                              <span className="text-[10px] font-semibold text-emerald-600 ml-auto tabular-nums">
+                                {Math.round(p.verdict_diff)}%
                               </span>
                             )}
                             {p.url && (
@@ -591,7 +597,7 @@ export default function Home() {
                               className="text-xs text-indigo-600 hover:text-indigo-800 font-medium hover:underline underline-offset-2 text-left"
                             >{p.area}</button>
                           </td>
-                          <td className="px-2 py-2.5 text-[11px] text-slate-600 whitespace-nowrap">{p.date_str || '—'}</td>
+                          <td className="px-2 py-2.5 text-[11px] text-slate-600 whitespace-nowrap">{displayDate(p)}</td>
                           <td className="pr-4 py-2.5 text-right">
                             {p.url ? (
                               <a href={p.url} target="_blank" rel="noopener noreferrer"
@@ -623,7 +629,7 @@ export default function Home() {
                           <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: c.dot }} />
                           {p.source}
                         </span>
-                        <span className="text-xs text-slate-400 shrink-0">{p.date_str || '—'}</span>
+                        <span className="text-xs text-slate-400 shrink-0">{displayDate(p)}</span>
                       </div>
                       <p className="text-sm font-semibold text-slate-800 mb-2.5 leading-snug">{p.prop_name}</p>
                       <div className="flex items-center justify-between gap-2">
